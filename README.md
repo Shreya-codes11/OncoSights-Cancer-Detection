@@ -144,12 +144,10 @@ OncoSights is an academic project intended for educational and research purposes
 - Only load trusted model files, particularly serialized `.pkl` files.
 
 ## Future Enhancements
-
-- Improve model evaluation using independent test datasets.
+ 
 - Enhance the user interface and prediction-result presentation.
-- Add clearer model-performance and limitation reporting.
 - Improve deployment and model-file management.
-- Expand patient-friendly explanations and educational resources.
+ 
 
 ## Author
 
