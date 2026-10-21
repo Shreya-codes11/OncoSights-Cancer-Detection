@@ -1,0 +1,11 @@
+# Large trained models
+models/colon_cancer.keras
+models/lung_cancer.keras
+models/cancer_classifier.h5
+
+# Sensitive and temporary files
+.env
+uploads/
+venv/
+__pycache__/
+*.pyc

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oncosights</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        #uploadImg {
+            width: 100% !important;
+            height: 400px !important;
+            object-fit: contain !important;
+            border-radius: 10px !important;
+        }
+
+        /* Loading animation */
+        .loading {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Hide the prediction form initially */
+        #predictionForm {
+            display: none;
+        }
+
+        body {
+            background-image: url('/static/home.jpg'); /* Replace with your image URL */
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Flexbox layout for prediction and precaution sections */
+        .flex-container {
+            display: flex;
+            gap: 20px; /* Space between the two sections */
+        }
+
+        .flex-container > div {
+            flex: 1; /* Equal width for both sections */
+        }
+        .precaution-box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+}
+    .bg{
+        background-color: white;
+    }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen bg-gray-50">
+     <!-- Navigation Bar -->
+     <nav class="bg">
+        <div class="container mx-auto flex justify-between items-center">
+            <img class="text-2xl font-bold" src="/static/logo2.png">
+            <ul class="flex space-x-6">
+                <li><a href="#upload-section" class="hover:underline">Upload</a></li>
+                <li><a href="#predictionForm" class="hover:underline">Predict</a></li>
+                <li><a href="#precautionTreatmentSection" class="hover:underline">Precaution</a></li>
+                <li><a href="/healthbot" target="_blank" class="hover:underline">Chat</a></li>
+            </ul>
+        </div>
+    </nav>
+  <div class="flex justify-center items-center w-full h-screen">
+    <!-- Main Content Section -->
+    <div id="upload-section" class="flex-grow flex justify-center items-center py-5">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 class="text-2xl font-semibold text-center mb-6">Upload Your Image for Analysis</h2>
+            <img id="uploadImg" src="static/upload-icon.png" alt="uploadImage" class="border rounded-lg mb-4 cursor-pointer">
+            <input type="file" id="fileInput" style="display: none;" accept="image/*">
+            <center><button id="submitButton" class="bg-green-400 rounded-md p-2 px-4 m-2 hover:bg-green-300 text-white">Submit Image</button></center>
+
+            <!-- Loading Animation -->
+            <center><div id="loading" class="loading"></div></center>
+
+            <!-- Result -->
+            <div id="result" class="mt-6 text-center hidden">
+                <h3 id="imageType" class="text-lg font-semibold"></h3>
+                <h3 id="cancerStatus" class="text-lg font-semibold"></h3>
+                <p id="cancerClass"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prediction and Precaution Sections -->
+    <div id="predictionForm" class="flex-grow flex justify-center items-center py-5">
+        <div class="flex-container">
+            <!-- Predict Cancer Stage Section -->
+            <div class="bg-white p-8 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold text-center mb-6 text-gray-800">Predict Cancer Stage</h2>
+                <form id="predictionFormContent" action="/predict" method="POST" class="space-y-6">
+                    <!-- Age Input -->
+                    <div>
+                        <label for="age" class="block text-gray-700 font-medium">Age:</label>
+                        <input type="number" id="age" name="age" min="1"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        required>
+                    </div>
+
+                    <!-- Tumor Size Input -->
+                    <div>
+                        <label for="tumor_size" class="block text-gray-700 font-medium">Tumor Size (cm):</label>
+                        <input type="number" step="0.01" id="tumor_size" name="tumor_size" min="0.01"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        required>
+                    </div>
+
+                    <!-- Lymph Node Involvement -->
+                    <div>
+                        <label class="block text-gray-700 font-medium">Lymph Node Involvement:</label>
+                        <label for="lymph_node_involvement_yes" class="mr-4">
+                            <input type="radio" id="lymph_node_involvement_yes" name="lymph_node_involvement" value="1">
+                            Yes
+                        </label>
+                        <label for="lymph_node_involvement_no">
+                            <input type="radio" id="lymph_node_involvement_no" name="lymph_node_involvement" value="0" checked>
+                            No
+                        </label>
+                    </div>
+
+                    <!-- Metastasis -->
+                    <div>
+                        <label class="block text-gray-700 font-medium">Metastasis:</label>
+                        <label for="metastasis_yes" class="mr-4">
+                            <input type="radio" id="metastasis_yes" name="metastasis" value="1">
+                            Yes
+                        </label>
+                        <label for="metastasis_no">
+                            <input type="radio" id="metastasis_no" name="metastasis" value="0" checked>
+                            No
+                        </label>
+                    </div>
+
+                    <!-- Cancer Type -->
+                    <div>
+                        <label for="cancer_type" class="block text-gray-700 font-medium">Cancer Type:</label>
+                        <input type="text" id="cancer_type" name="cancer_type"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 focus:outline-none"
+                        readonly required>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" 
+                    class="w-full bg-blue-500 text-white font-medium py-2 rounded-md hover:bg-blue-600 transition">
+                    Predict Stage
+                </button>
+
+                <!-- Predicted Stage -->
+                <div id="predictedStage" class="mt-6 text-center hidden">
+                    <h3 id="stageResult" class="text-lg font-semibold"></h3>
+                </div>
+            </form>
+        </div>
+
+        <!-- Precaution and Treatment Section -->
+        <div id="precautionTreatmentSection" class="precaution-box">
+            <h2 class="text-2xl font-semibold text-center mb-6 text-gray-800">Precaution and Treatment</h2>
+            <div id="precautionTreatmentContent" class="space-y-6">
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<a href="/healthbot" target="_blank" class="fixed bottom-5 right-5 bg-gray-800 text-white rounded-full px-6 py-3 hover:bg-gray-700 transition shadow-lg">
+    Start Chatting
+</a>
+
+
+<script>
+    const imgDiv = document.getElementById('uploadImg');
+    const fileInput = document.getElementById('fileInput');
+    const submitButton = document.getElementById('submitButton');
+    const loading = document.getElementById('loading');
+    const resultSection = document.getElementById('result');
+    const imageType = document.getElementById('imageType');
+    const cancerStatus = document.getElementById('cancerStatus');
+    const cancerClass = document.getElementById('cancerClass');
+    const predictionForm = document.getElementById('predictionForm');
+    const predictedStageDiv = document.getElementById('predictedStage');
+    const stageResult = document.getElementById('stageResult');
+    const pred=document.getElementById('precautionTreatmentContent');
+
+    // Hide the prediction form initially
+    predictionForm.style.display = 'none';
+    predictedStageDiv.style.display = 'none';
+
+    imgDiv.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imgDiv.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    submitButton.addEventListener('click', function() {
+        const file = fileInput.files[0];
+        if (!file) {
+            alert("Please select a file.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        // Show loading animation
+        loading.style.display = 'block';
+        resultSection.style.display = 'none';
+
+        fetch('/upload', {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Hide loading animation
+            loading.style.display = 'none';
+            resultSection.style.display = 'block';
+
+            if (data.cancer_status && data.image_type && data.cancer_class) {
+                // Display image type, cancer status, and cancer class
+                imageType.textContent = data.image_type;
+                cancerStatus.textContent = data.cancer_status;
+                cancerClass.textContent = data.cancer_class;
+
+                // Automatically populate the cancer type textbox
+                const cancerTypeInput = document.getElementById('cancer_type');
+                cancerTypeInput.value = data.image_type.replace('Image: ', '').trim();
+
+                // If cancer is present, show the prediction form
+                if (data.cancer_status === "Cancer: Present") {
+                    predictionForm.style.display = 'block';
+                } else {
+                    predictionForm.style.display = 'none';
+                }
+            } else {
+                alert('Error: ' + data.error);  // Handle error
+            }
+        })
+        .catch(error => {
+            console.error('Error uploading the image:', error);
+            alert('Error uploading the image.');
+            loading.style.display = 'none';
+        });
+    });
+
+    // JavaScript to handle form submission and display the predicted stage
+    predictionForm.addEventListener('submit', function(event) {
+        event.preventDefault();  // Prevent the default form submission
+
+        const formData = new FormData(document.getElementById('predictionFormContent'));
+
+        fetch('/predict', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Display the predicted cancer stage
+            stageResult.textContent = data.predicted_stage;
+            predictedStageDiv.style.display = 'block';
+
+            // Get cancer type and stage
+            const cancerType = document.getElementById('cancer_type').value;
+            const stage = data.predicted_stage.match(/Stage (\d)/)[1]; // Extract stage number
+
+            // Display precaution and treatment details based on cancer type and stage
+            displayPrecautionAndTreatment(cancerType, stage);
+        })
+        .catch(error => {
+            console.error('Error predicting cancer stage:', error);
+        });
+    });
+
+    // Function to display precaution and treatment details
+    function displayPrecautionAndTreatment(cancerType, stage) {
+        let precautions = '';
+        let treatments = '';
+
+        switch (cancerType.toLowerCase()) {
+            case 'lung':
+                precautions = getLungCancerPrecautions(stage);
+                treatments = getLungCancerTreatments(stage);
+                break;
+            case 'skin':
+                precautions = getSkinCancerPrecautions(stage);
+                treatments = getSkinCancerTreatments(stage);
+                break;
+            case 'colon':
+                precautions = getColonCancerPrecautions(stage);
+                treatments = getColonCancerTreatments(stage);
+                break;
+            default:
+                precautions = 'No specific precautions available.';
+                treatments = 'No specific treatments available.';
+        }
+
+        pred.innerHTML = `
+            <h1 class="text-gray-700">Precautions:</h1>
+            <p>${precautions}</p>
+            <h1 class="text-gray-700">Treatments:</h1>
+            <p>${treatments}</p>
+        `;
+        pred.style.display = 'block';
+    }
+
+    // Functions to get precautions and treatments for each cancer type
+    function getLungCancerPrecautions(stage) {
+        switch (stage) {
+            case '1':
+                return 'Avoid smoking, limit exposure to pollutants, and maintain a healthy diet.';
+            case '2':
+                return 'Regular medical check-ups, avoid secondhand smoke, and exercise regularly.';
+            case '3':
+                return 'Follow doctor’s advice strictly, avoid respiratory infections, and consider palliative care.';
+            default:
+                return 'General precautions: Avoid smoking and maintain a healthy lifestyle.';
+        }
+    }
+
+    function getLungCancerTreatments(stage) {
+        switch (stage) {
+            case '1':
+                return 'Surgery to remove the tumor, followed by chemotherapy or radiation therapy.';
+            case '2':
+                return 'Combination of surgery, chemotherapy, and radiation therapy.';
+            case '3':
+                return 'Targeted therapy, immunotherapy, and palliative care.';
+            default:
+                return 'Consult an oncologist for personalized treatment options.';
+        }
+    }
+
+    function getSkinCancerPrecautions(stage) {
+        switch (stage) {
+            case '1':
+                return 'Avoid excessive sun exposure, use sunscreen, and wear protective clothing.';
+            case '2':
+                return 'Regular skin checks, avoid tanning beds, and monitor moles for changes.';
+            case '3':
+                return 'Follow dermatologist’s advice, avoid UV exposure, and maintain skin hygiene.';
+            default:
+                return 'General precautions: Protect skin from UV rays and avoid harmful chemicals.';
+        }
+    }
+
+    function getSkinCancerTreatments(stage) {
+        switch (stage) {
+            case '1':
+                return 'Surgical removal of the tumor, cryotherapy, or topical treatments.';
+            case '2':
+                return 'Mohs surgery, radiation therapy, or immunotherapy.';
+            case '3':
+                return 'Targeted therapy, chemotherapy, or advanced surgical options.';
+            default:
+                return 'Consult a dermatologist for personalized treatment options.';
+        }
+    }
+
+    function getColonCancerPrecautions(stage) {
+        switch (stage) {
+            case '1':
+                return 'Maintain a high-fiber diet, avoid processed meats, and exercise regularly.';
+            case '2':
+                return 'Regular colonoscopies, avoid smoking, and limit alcohol consumption.';
+            case '3':
+                return 'Follow doctor’s advice, manage stress, and maintain a balanced diet.';
+            default:
+                return 'General precautions: Eat a healthy diet and avoid sedentary lifestyle.';
+        }
+    }
+
+    function getColonCancerTreatments(stage) {
+        switch (stage) {
+            case '1':
+                return 'Surgical removal of the tumor, followed by chemotherapy if needed.';
+            case '2':
+                return 'Combination of surgery, chemotherapy, and radiation therapy.';
+            case '3':
+                return 'Targeted therapy, immunotherapy, and palliative care.';
+            default:
+                return 'Consult a gastroenterologist for personalized treatment options.';
+        }
+    }
+
+    // Form validation
+    document.getElementById("predictionFormContent").addEventListener("submit", function(event) {
+        let ageInput = document.getElementById("age");
+        let tumorSizeInput = document.getElementById("tumor_size");
+
+        if (ageInput.value < 1) {
+            alert("Age must be at least 1.");
+            ageInput.value = 1;
+            event.preventDefault(); // Prevent form submission
+        }
+
+        if (tumorSizeInput.value < 0.01) {
+            alert("Tumor size must be at least 0.01 cm.");
+            tumorSizeInput.value = 0.01;
+            event.preventDefault(); // Prevent form submission
+        }
+    });
+    // Save data to localStorage
+    function saveHistory(imageSrc, cancerType, predictedStage) {
+        // Get existing history or initialize an empty array
+        let history = JSON.parse(localStorage.getItem('cancerHistory')) || [];
+
+        // Add new entry
+        history.push({
+            image: imageSrc,
+            cancerType: cancerType,
+            predictedStage: predictedStage,
+            timestamp: new Date().toLocaleString() // Add a timestamp
+        });
+
+        // Save back to localStorage
+        localStorage.setItem('cancerHistory', JSON.stringify(history));
+    } 
+
+    // Call this function after prediction is made
+    predictionForm.addEventListener('submit', function(event) {
+        event.preventDefault();  // Prevent the default form submission
+
+        const formData = new FormData(document.getElementById('predictionFormContent'));
+
+        fetch('/predict', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Display the predicted cancer stage
+            stageResult.textContent = data.predicted_stage;
+            predictedStageDiv.style.display = 'block';
+
+            // Get cancer type and stage
+            const cancerType = document.getElementById('cancer_type').value;
+            const stage = data.predicted_stage.match(/Stage (\d)/)[1]; // Extract stage number
+
+            // Save to history
+            saveHistory(imgDiv.src, cancerType, data.predicted_stage);
+
+            // Display precaution and treatment details based on cancer type and stage
+            displayPrecautionAndTreatment(cancerType, stage);
+        })
+        .catch(error => {
+            console.error('Error predicting cancer stage:', error);
+        });
+    });
+</script>
+</body>
+</html>

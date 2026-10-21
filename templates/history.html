@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancer Prediction History</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #6b46c1, #4299e1);
+        }
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .history-table th, .history-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .history-table th {
+            background-color: #4c51bf;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .history-table tr:hover {
+            background-color: #f7fafc;
+        }
+        .history-table img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen p-6">
+    <div class="container mx-auto">
+        <h1 class="text-4xl font-bold text-center text-white mb-8">Cancer Prediction History</h1>
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Cancer Type</th>
+                        <th>Predicted Stage</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="historyList">
+                    <!-- History items will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Retrieve history from localStorage
+        const history = JSON.parse(localStorage.getItem('cancerHistory')) || [];
+
+        // Display history
+        const historyList = document.getElementById('historyList');
+        if (history.length === 0) {
+            historyList.innerHTML = '<tr><td colspan="4" class="text-center py-6 text-gray-600">No history available.</td></tr>';
+        } else {
+            history.forEach((entry, index) => {
+                const historyRow = document.createElement('tr');
+                historyRow.innerHTML = `
+                    <td><img src="${entry.image}" alt="Uploaded Image"></td>
+                    <td class="text-gray-800">${entry.cancerType}</td>
+                    <td class="text-gray-800">${entry.predictedStage}</td>
+                    <td class="text-gray-800">${entry.timestamp}</td>
+                `;
+                historyList.appendChild(historyRow);
+            });
+        }
+    </script>
+</body>
+</html>

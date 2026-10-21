@@ -1,0 +1,12 @@
+# Query: about us
+# ContextLines: 1
+
+2 results - 1 file
+
+templates\index.html:
+  6145                                          </li>
+  6146:                                         <li id="menu-item-22" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children nectar-regular-menu-item menu-item-22"><a href="/about-the-cancer-imaging-archive-tcia/"><span class="menu-title-text">About Us</span></a>
+  6147                                          </li> 
+
+  6469                                      </li>
+  6470:                                                                    <ul class="sub-menu">
